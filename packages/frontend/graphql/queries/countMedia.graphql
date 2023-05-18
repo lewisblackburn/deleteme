@@ -1,0 +1,22 @@
+query CountMedia {
+	aggregateMovie {
+		_count {
+			_all
+		}
+	}
+	aggregateUser {
+		_count {
+			_all
+		}
+	}
+	aggregatePerson {
+		_count {
+			_all
+		}
+	}
+	aggregateMovieReview {
+		_count {
+			_all
+		}
+	}
+}

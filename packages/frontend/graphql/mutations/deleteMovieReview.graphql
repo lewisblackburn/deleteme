@@ -1,0 +1,3 @@
+mutation deleteMovieReview($movieId: Int!) {
+	deleteMovieReview(movieId: $movieId)
+}

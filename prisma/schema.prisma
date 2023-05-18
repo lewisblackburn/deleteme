@@ -1,0 +1,135 @@
+/// Throughout the following code, I use the following notation:
+/// @TypeGraphQL.omit(output: true, input: false) -> input is generated but not output (except for the password field)
+/// This means that the field is not included in the output or input types of the generated files.
+/// It will mostly be used for fields that are not part of the public API of the type.
+/// Such as internal fields used for implementation details e.g password and the user (ctx.req.session.userId) field.
+
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../packages/backend/src/generated/type-graphql"
+}
+
+model User {
+  id                Int               @id @default(autoincrement())
+  confirmed         Boolean           @default(false)
+  email             String            @unique
+  username          String            @unique
+  displayname       String
+  /// @TypeGraphQL.omit(output: true, input: true)
+  password          String
+  role              Role              @default(USER)
+  avatar            String            @default(value: "https://via.placeholder.com/400x400")
+  bio               String            @default(value: "")
+  location          String            @default(value: "")
+  website           String            @default(value: "")
+  dob               DateTime          @default(now())
+  likedMovies       MovieLike[]
+  movieReviews      MovieReview[]
+  likedMovieReviews MovieReviewLike[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model Person {
+  id        Int            @id @default(autoincrement())
+  career    Career[]
+  name      String
+  poster    String         @default(value: "https://via.placeholder.com/400x600")
+  locked    Boolean        @default(false)
+  bio       String?
+  age       Int?
+  movies    ActorInMovie[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model Movie {
+  id        Int            @id @default(autoincrement())
+  title     String
+  tagline   String
+  overview  String
+  poster    String         @default(value: "https://via.placeholder.com/400x600")
+  backdrop  String         @default(value: "https://via.placeholder.com/1200x600")
+  locked    Boolean        @default(false)
+  released  DateTime?
+  runtime   Float?
+  trailer   String?
+  rating    String? // age rating of the movie
+  actors    ActorInMovie[]
+  genres    Genre[]
+  reviews   MovieReview[] // collective rating will come from rating in reviews
+  likes     MovieLike[]
+  updatedAt DateTime       @updatedAt
+  createdAt DateTime       @default(now())
+}
+
+model ActorInMovie {
+  movie    Movie  @relation(fields: [movieId], references: [id])
+  movieId  Int
+  person   Person @relation(fields: [personId], references: [id])
+  personId Int
+  role     String
+
+  @@id([personId, movieId])
+}
+
+model Genre {
+  id     Int     @id @default(autoincrement())
+  name   String
+  movies Movie[]
+}
+
+model MovieLike {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  movieId   Int
+  createdAt DateTime @default(now())
+
+  @@id([userId, movieId])
+}
+
+model MovieReview {
+  // These will be blank for users who only want to rate the movie
+  review String?
+  rating Int
+  likes  MovieReviewLike[]
+
+  user    User  @relation(fields: [userId], references: [id])
+  userId  Int
+  movie   Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  @@id([userId, movieId])
+}
+
+model MovieReviewLike {
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  reviewUserId  Int
+  reviewMovieId Int
+  movieReview   MovieReview @relation(fields: [reviewUserId, reviewMovieId], references: [userId, movieId])
+  createdAt     DateTime    @default(now())
+
+  @@id([userId, reviewUserId, reviewMovieId])
+}
+
+enum Career {
+  AUTHOR
+  ARTIST
+  ACTOR
+}
+
+enum Role {
+  USER
+  ADMIN
+}

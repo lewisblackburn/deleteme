@@ -1,0 +1,5 @@
+query Person($personId: Int!) {
+	person(personId: $personId) {
+		...RegularPerson
+	}
+}

@@ -1,0 +1,7 @@
+mutation CreateMovie($data: MovieCreateInput!) {
+	createMovie(data: $data) {
+		id
+		title
+		overview
+	}
+}

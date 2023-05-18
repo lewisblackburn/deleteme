@@ -1,0 +1,13 @@
+query People(
+	$where: PersonWhereInput
+	$orderBy: [PersonOrderByWithRelationInput!]
+	$cursor: PersonWhereUniqueInput
+	$take: Int
+) {
+	people(where: $where, orderBy: $orderBy, cursor: $cursor, take: $take) {
+		id
+		career
+		name
+		poster
+	}
+}

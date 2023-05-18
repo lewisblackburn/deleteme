@@ -1,0 +1,15 @@
+query MovieReview($where: MovieReviewWhereUniqueInput!) {
+	movieReview(where: $where) {
+    movieId
+		review
+		rating
+		user {
+      id
+			username
+			avatar
+		}
+		_count {
+			likes
+		}
+	}
+}

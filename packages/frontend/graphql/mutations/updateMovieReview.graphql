@@ -1,0 +1,9 @@
+mutation updateMovieReivew($data: MovieReviewUpdateInput!, $where: MovieReviewWhereUniqueInput!) {
+	updateMovieReview(data: $data, where: $where) {
+		review
+		rating
+		_count {
+			likes
+		}
+	}
+}
